@@ -425,7 +425,7 @@ def get_remote_mtime(url):
             return beijing_time.strftime('%Y-%m-%d %H:%M:%S')
     return None
 
-def fetch_url_file(url, out_dir, is_download_gram):
+def fetch_url_file(url, out_dir, is_download_gram = False):
     '''
     获取远程文件  
     url - 远程资源地址  
@@ -474,6 +474,7 @@ def download_dict(url_dict, out_url_directory, is_download_gram = False):
         out_url_directory = out_url_directory or proj_dir
         out_file = 'wanxiang-lts-zh-hans.gram'
 
+    print(f'🔜  远程资源： {url_dict}')
     print(f'🔜  目标路径： {out_url_directory}')
     
     # modified time
