@@ -105,3 +105,7 @@ octagram:
 如果觉得项目好用，可以请AMZ喝咖啡
 
    <img src="https://github.com/amzxyz/rime_wanxiang_pro/blob/main/.github/%E8%B5%9E%E8%B5%8F.jpeg" width="400">   
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=amzxyz/RIME-LMDG,amzxyz/rime_wanxiang,amzxyz/rime_wanxiang_pro&type=Date)](https://www.star-history.com/#amzxyz/RIME-LMDG&amzxyz/rime_wanxiang&amzxyz/rime_wanxiang_pro&Date)
