@@ -539,13 +539,13 @@ def exec(proj_dir, work_dir, repository_url):
 
     # --- 仓库克隆 ---
     if int(dict_type) == 1:
-        print('🔜  === 〔仓库克隆〕开始获取最新词库文件 ===')
+        print('🔜  === 〔 仓库克隆 〕开始获取最新词库文件 ===')
         exec_success = sync_repository(repository_url, local_directory)
         if not exec_success:
             return False
     # --- 远程下载 ---
     if int(dict_type) == 2:
-        print('🔜  === 〔远程下载〕开始获取最新词库文件 ===')
+        print('🔜  === 〔 远程下载 〕开始获取最新词库文件 ===')
         # 直接下载仓库词典文件
         url_dict = url_dict_rime_wanxiang
         out_url_directory = (proj_dir / work_dir / 'rime_url').resolve()
@@ -562,7 +562,7 @@ def exec(proj_dir, work_dir, repository_url):
         print(f'☑️  已加载词典 {out_url_directory}/cn_dicts \n')                
     # --- 本地词典 ---
     if int(dict_type) == 3:
-        print('🔜  === 〔本地词典〕开始转换本地词库文件 ===')
+        print('🔜  === 〔 本地词典 〕开始转换本地词库文件 ===')
         if not local_directory.exists():
             print(f'''
 🚫  请检查 .temp_rime/{repository_name}/cn_dicts 是否存在
