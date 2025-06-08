@@ -521,7 +521,7 @@ def download_dict(url_dict, out_url_directory, is_download_gram = False):
         else:
             fetch_url_file(url_dict, out_url_directory, is_download_gram)
     else:
-        fetch_url_file(url_dict, out_url_directory)
+        fetch_url_file(url_dict, out_url_directory, is_download_gram)
         # 解压整个ZIP文件到指定目录
         if not is_download_gram:
             with zipfile.ZipFile((out_url_directory / out_file), 'r') as zip_ref:
@@ -750,10 +750,10 @@ if __name__ == "__main__":
 # 目标候选仓库：
 # ¹ 万象拼音 ² 白霜拼音  ³ 雾凇拼音  ⁰ 其它完整仓库地址 
 
-如：4 ➭ https://github.com/amzxyz/rime_wanxiang.git
+如：0 ➭ https://github.com/amzxyz/rime_wanxiang.git
 ------------------------------------------------------------------------------
             ''')
-            repo_type = input(f"🔔  默认「 万象拼音 」? (1): ").strip().lower() or "1"
+            repo_type = input(f"🔔  默认「 白霜拼音 」? (2): ").strip().lower() or "2"
         if repo_type == '1':
             repository_url = repository_url_wanxiang
         elif repo_type == '2':
