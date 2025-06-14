@@ -265,8 +265,9 @@ def convert(src_dir: Path, out_dir: Path, file_endswith_filter: str) -> None:
 
                 word, code, weight = parts[0], parts[1], parts[2]
                 # 不喜欢带调的（与其他可能使用的拼音词库同步后会冲突），转换成不带调的
-                for idx, char in enumerate(list_with_tone):
-                    code = code.replace(char, list_without_tone[idx])
+                if is_clear_tone:
+                    for idx, char in enumerate(list_with_tone):
+                        code = code.replace(char, list_without_tone[idx])
                 
                 if word_length_limit > 0 and len(word) > word_length_limit:
                     # print(f"过滤掉长词语: {word} (长度: {len(word)})")
@@ -710,7 +711,7 @@ if __name__ == "__main__":
 如：16 ➭ 拼音+虎码首末；20 ➭ 五笔常规；31 ➭ 虎码整句
 ------------------------------------------------------------------------------
         ''')
-        code_type = input(f"🔔  默认「 自然码 」? (13): ").strip().lower() or "13"
+        code_type = input(f"🔔  默认「 虎码首末 ¦ 辅助码 」? (16): ").strip().lower() or "16"
         # print(f'🔜  {code_type}   ➭ {code_dict[code_type]}\n')
     print(f'🔜  {code_type} {code_dict[code_type]} \n')
 
@@ -753,7 +754,7 @@ if __name__ == "__main__":
 如：0 ➭ https://github.com/amzxyz/rime_wanxiang.git
 ------------------------------------------------------------------------------
             ''')
-            repo_type = input(f"🔔  默认「 白霜拼音 」? (2): ").strip().lower() or "2"
+            repo_type = input(f"🔔  默认「 万象拼音 」? (1): ").strip().lower() or "1"
         if repo_type == '1':
             repository_url = repository_url_wanxiang
         elif repo_type == '2':
@@ -785,6 +786,11 @@ if __name__ == "__main__":
     # 是否需要下载语言大模型
     is_download_gram = bool(int(is_download_gram))
     url_gram = 'https://github.com/amzxyz/RIME-LMDG/releases/download/LTS/wanxiang-lts-zh-hans.gram'
+
+    # ⑥ --- 是否清除声调 ---
+    # 万象拼音词库本身是带声调的
+    # 清除←True  False→不清除
+    is_clear_tone = True
 
     # 开始执行
     exec(proj_dir, work_dir, repository_url)
