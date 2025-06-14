@@ -68,6 +68,10 @@ def convert(src_dir, out_dir, src_file, out_file):
                 if '' in code:
                     code = code.split('')[1]
 
+                # 过滤掉过长、过短(如 1)的词条
+                if len(word) == 1 or (word_length_limit > 0 and len(word) > word_length_limit):
+                    continue
+
                 # 此外不再过滤非 8105 字词（源码表已做过滤 & 加载超范字词）
                 # 仅处理已合成词典中 不存在 或 已存在但编码不同的字词
                 if word not in res_dict or code not in res_dict[word]:
@@ -90,6 +94,36 @@ def combine(out_dir, out_file):
         if file_path.is_file() and file_path.name.startswith(f'{out_file.split('.')[0] + '.'}'):
             with open(file_path, 'r', encoding='utf-8') as f:
                 lines_total.extend(f.readlines())
+
+    # 加载定频时添加的自造词词典
+    # 修改为直接从 user_words.lua 中解析，不再依赖其生成的 user_words.dict.yaml
+    type = ""   # tiger | wubi
+    lines_users = []
+    # user_words_path = out_dir / 'user_words.dict.yaml'
+    user_words_path = Path(out_dir / '../lua/user_words.lua').resolve()
+    # print(user_words_path)
+    if user_words_path.exists():
+        with open(user_words_path, 'r', encoding='utf-8') as f:
+            print('☑️  已加载用户自造词文件 » %s' % user_words_path)
+            for l in f.readlines():
+                l = l.strip()
+                if l.startswith('-- type'):
+                    type = l.split(': ')[1]   # tiger | wubi
+                if l.startswith('["'):
+                    _arr = l.split('"] = "')
+                    word = _arr[0][2:]
+                    code = _arr[1][:-2]
+                    weight = '100000000' if is_keep_user_dict_first else '1'
+                    # print(f'{word}\t{code}\t{weight}')
+                    lines_users.append(f'{word}\t{code}\t{weight}\n')
+        # print(type)
+        # ^ 虎码常规
+        if type == 'tiger' and code_type == '30':
+            lines_total.extend(lines_users)
+        # ^ 五笔常规
+        if type == 'wubi' and code_type == '20':
+            lines_total.extend(lines_users)
+
 
     # 去重并处理词条
     for line in set(lines_total):
@@ -117,6 +151,10 @@ def combine(out_dir, out_file):
 
         # 处理每组词长
         for word_len in sorted(word_len_dict.keys()):
+            # 过滤掉过长、过短(如 1)的词条
+            if word_len == 1 or (word_length_limit > 0 and word_len > word_length_limit):
+                continue
+
             # 第二级：按编码长度分组
             code_len_dict = defaultdict(list)
             for word, value in word_len_dict[word_len]:
@@ -200,7 +238,17 @@ if __name__ == '__main__':
     # ² 五笔：²1 五笔整句，²0 五笔常规
     # ³ 虎码：³1 虎码整句，³0 虎码常规 
 
+    # ③ --- 词长限制 ---
+    # 是否限制词库最大词长，若为 0 ，则不限制
+    # - 主要是为了过滤掉包含已添加词汇的较长词条
+    # - 默认删除了单字（因为积累单字毫无意义）
+    word_length_limit = 7
+
     code_type = sys.argv[1] if len(sys.argv) > 1 else ''
 
+    # 词长限制 -- 只限制拼音、整句，常规形码不限制
+    if not (code_type.startswith("1") or code_type in ['21', '31']):
+        word_length_limit = 0
+    
     exec(code_type)
     
