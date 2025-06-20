@@ -549,6 +549,7 @@ def exec(proj_dir, work_dir, repository_url):
     repository_name = repository_url.split('/')[-1][:-4] # 如 rime_wanxiang
     local_directory = (proj_dir / work_dir / repository_name).resolve()
     out_dict = f'cn_dicts_{repository_name}'
+    cn_dicts = 'cn_dicts' if repo_type != '1' else 'zh_dicts' # 万象改字典名称了……
 
     # --- 仓库克隆 ---
     if int(dict_type) == 1:
@@ -592,8 +593,8 @@ def exec(proj_dir, work_dir, repository_url):
     # '非万象Pro词库转换为带辅助码版本
     if code_type.startswith("1"):
         metadata_directory = Path(proj_dir / 'scripts').resolve()   # / 'auxiliary_code.yaml'
-        input_path =  Path(proj_dir / work_dir / repository_name / 'cn_dicts').resolve()
-        output_path = Path(proj_dir / work_dir / (repository_name + '_aux') / 'cn_dicts').resolve()
+        input_path =  Path(proj_dir / work_dir / repository_name / cn_dicts).resolve()
+        output_path = Path(proj_dir / work_dir / (repository_name + '_aux') / cn_dicts).resolve()
         # 如果存在输出文件，先删除
         if os.path.exists(output_path):
             shutil.rmtree(output_path)
@@ -606,10 +607,10 @@ def exec(proj_dir, work_dir, repository_url):
         process_input(input_path, metadata, output_path)
 
     # ② 转换拼音词库为目标词库
-    src_dir = proj_dir / work_dir / repository_name / 'cn_dicts'
+    src_dir = proj_dir / work_dir / repository_name / cn_dicts
     out_dir = proj_dir / work_dir / out_dict
     if code_type.startswith("1"):
-        src_dir = proj_dir / work_dir / (repository_name + '_aux') / 'cn_dicts'
+        src_dir = proj_dir / work_dir / (repository_name + '_aux') / cn_dicts
 
     # 已存在，先删除，再转换
     if out_dir.exists():
@@ -619,7 +620,7 @@ def exec(proj_dir, work_dir, repository_url):
     # return
     # 分包操作，以减小推送之后仓库快照体积
     if not is_merge:
-        dist_dir = proj_dir / 'cn_dicts'
+        dist_dir = proj_dir / cn_dicts
         if dist_dir.exists():
             shutil.rmtree(dist_dir)
         shutil.copytree(out_dir, dist_dir)
@@ -723,7 +724,7 @@ if __name__ == "__main__":
 如：16 ➭ 拼音+虎码首末；20 ➭ 五笔常规；31 ➭ 虎码整句
 ------------------------------------------------------------------------------
         ''')
-        code_type = input(f"🔔  默认「 虎码首末 ¦ 辅助码 」? (16): ").strip().lower() or "16"
+        code_type = input(f"🔔  默认「 鹤形 ¦ 辅助码 」? (12): ").strip().lower() or "12"
         # print(f'🔜  {code_type}   ➭ {code_dict[code_type]}\n')
     print(f'🔜  {code_type} {code_dict[code_type]} \n')
 
@@ -766,7 +767,7 @@ if __name__ == "__main__":
 如：0 ➭ https://github.com/amzxyz/rime_wanxiang.git
 ------------------------------------------------------------------------------
             ''')
-            repo_type = input(f"🔔  默认「 白霜拼音 」? (2): ").strip().lower() or "2"
+            repo_type = input(f"🔔  默认「 万象拼音 」? (1): ").strip().lower() or "1"
         if repo_type == '1':
             repository_url = repository_url_wanxiang
         elif repo_type == '2':
