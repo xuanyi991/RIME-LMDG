@@ -33,13 +33,17 @@ def load_aux_metadata(path: str) -> Dict[str, str]:
     aux_map: Dict[str, str] = {}
     with open(path, encoding='utf-8') as f:
         for line in f:
-            if not line.strip():
+            if not line.strip() or line.startswith('#'):
                 continue
             parts = line.rstrip('\n').split('\t')
             if len(parts) < 2 or len(parts[0]) != 1:
                 continue
-            char, seg = parts[:2]
-            aux_map[char] = seg.split()[0]
+            char = parts[0]
+            seg_full = parts[1]
+            # 使用正则分隔，保留第一个分号后所有内容（含多分号），作为整体辅助码
+            seg_parts = re.split(AUX_SEP_REGEX, seg_full, maxsplit=1)
+            if len(seg_parts) > 1 and seg_parts[1].strip():
+                aux_map[char] = seg_parts[1].strip()
     print(f"✓ 辅助码加载 {len(aux_map)} 条")
     return aux_map
 
@@ -51,9 +55,17 @@ def refresh_aux(cols: List[str], word: str, aux_map: Dict[str, str], userdb: boo
     seg_idx = 0 if userdb else 1
     if not userdb and len(cols) == 1:
         cols.insert(1, '')
-    segs = build_seg_by_aux(word, aux_map)
-    if any(segs):
-        cols[seg_idx] = ' '.join(segs)
+
+    raw_segs = cols[seg_idx].split()
+    aux_segs = build_seg_by_aux(word, aux_map)
+
+    merged = []
+    for i, py in enumerate(raw_segs):
+        if i < len(aux_segs) and aux_segs[i]:
+            merged.append(f"{py};{aux_segs[i]}")  # 原拼音 + 整体辅助码
+        else:
+            merged.append(py)
+    cols[seg_idx] = ' '.join(merged)
     return cols
 
 def is_userdb_head(line: str) -> bool:
